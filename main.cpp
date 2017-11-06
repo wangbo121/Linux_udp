@@ -11,12 +11,9 @@
 
 #include "udp.h"
 
-#define IP_NATIVE_NULL "0.0.0.0"
-
-#define IP_NATIVE_SOCKET "127.0.0.1"
-#define PORT_NATIVE_SOCKET_SEND 49000
-#define PORT_NATIVE_SOCKET_RECEIVE 49005
-
+#define IP_NATIVE_SOCKET "127.0.0.1"//本机所用网卡的ip地址
+#define PORT_NATIVE_SOCKET_SEND 49000//本机要往外发送的套接字的端口
+#define PORT_NATIVE_SOCKET_RECEIVE 49005//本机要接收数据的套接字所使用的端口
 
 #define IP_SEND_TO "127.0.0.1"//发送目标的ip地址
 #define PORT_SENT_TO 49005//发送目标的port端口
@@ -27,11 +24,11 @@
 struct T_UDP_DEVICE udp_send;
 struct T_UDP_DEVICE udp_receive;
 
-
 int read_udp_data_test(unsigned char *temp, unsigned int len);
 
 int read_udp_data_test(unsigned char *temp, unsigned int len)
 {
+    printf("read_udp_data_test\n");
     return 0;
 }
 
@@ -46,6 +43,7 @@ int main()
      * 即，用49000的端口给49005的端口发送数据
      */
 
+    //udp_send.ip = "127.0.0.2";//改变发送的地址，做测试用
     udp_send.ip = IP_NATIVE_SOCKET;
     udp_send.port = PORT_NATIVE_SOCKET_SEND;
     open_socket_udp_dev(&udp_send.fd_socket, udp_send.ip, udp_send.port);

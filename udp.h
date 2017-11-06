@@ -8,8 +8,6 @@
 #ifndef UDP_H_
 #define UDP_H_
 
-#include <stdint.h>
-
 /*
  * 网络与主机字节转换函数:htons ntohs htonl ntohl (s 就是short l是long h是host n是network)
  * htons 把unsigned short类型从主机序转换到网络序
@@ -19,7 +17,7 @@
  */
 
 /*
- *其实htonl这些函数最后调用的还是__bswap，所以我这里直接用了__bswap函数
+ *其实htonl这些函数最后调用的还是__bswap
  */
 #if 0
 uint32_t htonl (uint32_t x)
@@ -34,6 +32,12 @@ uint32_t htonl (uint32_t x)
 }
 #endif
 
+#include <stdint.h>
+
+#define IP_NATIVE_NULL "0.0.0.0"
+#define IP_RECEIVE_ALL "0.0.0.0"//这个用来表示接收来自任意ip地址的数据
+#define UDP_RCV_BUF_SIZE 2000//udp接收数据最大缓存数组大小
+
 struct T_UDP_DEVICE
 {
     int fd_socket;//表示socket套接字的文件描述符，而这个socket描述符在创建的时候，我在用open_socket_udp_dev函数创建的时候就绑定了一个本地的ip和端口
@@ -42,16 +46,6 @@ struct T_UDP_DEVICE
     char *ip;//如果该T_UDP_DEVICE用于接收线程，那么这个ip指的就是本机准备接收来自该ip的地址的数据，比如，我只想接收来自“110.110.110.110”地址的数据，我就把这个ip赋值
     unsigned int port;//如果该T_UDP_DEVICE用于接收线程，那么这个port指的就是本机准备接收来自该port的地址的数据
 };
-
-extern unsigned char udp_recvbuf[2000];
-
-int open_udp_dev(char* ip_sendto, unsigned int port_sendto,unsigned int port_myrecv);
-int read_udp_data(unsigned char *buf, unsigned int len);
-int send_udp_data(unsigned char *buf, unsigned int len);
-int close_udp_dev();
-
-/*udp_recvbuf_and_process需要调用read函数来解析数据包获取实际数据*/
-void *udp_recvbuf_and_process(void * ptr_udp_device);
 
 uint64_t htonll(uint64_t n) ;
 uint64_t ntohll(uint64_t n) ;
@@ -89,16 +83,16 @@ int send_socket_udp_data(int fd_send_socket, unsigned char *buf, unsigned int le
  */
 int create_socket_udp_receive_thread(int fd_receive_socket,int (*ptr_fun)(unsigned char*,unsigned int),char *from_ip, unsigned int from_port);
 
+/*
+ * udp_recvbuf_and_process
+ * 创建udp接收线程时的，该线程所调用的函数
+ */
+void *udp_recvbuf_and_process(void * ptr_udp_device);
 
-extern struct sockaddr_in udp_sendto_addr;//服务器用于发送的socket
 extern int fd_sock_send;
 extern int fd_sock_recv;
 
-
 extern struct T_UDP_DEVICE udp_send;
 extern struct T_UDP_DEVICE udp_receive;
-
-
-
 
 #endif /* UDP_H_ */
